@@ -1,3 +1,9 @@
+{{
+    config(
+        post_hook="{{ export_to_parquet() }}"
+    )
+}}
+
 with customers as (
 
     select * from {{ ref('stg_customers') }}
