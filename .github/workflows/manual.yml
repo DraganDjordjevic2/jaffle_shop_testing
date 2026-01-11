@@ -17,7 +17,9 @@ jobs:
       - name: Run in dev container
         uses: devcontainers/ci@v0.3
         with:
-          runCmd: dbt docs generate --static
+          runCmd: |
+            dbt deps
+            dbt docs generate --static
       
       - name: Upload to EC2
         env:
