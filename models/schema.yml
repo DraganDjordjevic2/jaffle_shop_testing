@@ -12,7 +12,7 @@ models:
           - not_null
 
       - name: first_name
-        description: Customer's first name. PII.
+        description: Customer's first name. PII. new additional description to test docs changing
 
       - name: last_name
         description: Customer's last name. PII.
