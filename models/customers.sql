@@ -10,6 +10,12 @@ with customers as (
 
 ),
 
+with customers2 as (
+
+    select * from {{ ref('stg_customers') }}
+
+),
+
 orders as (
 
     select * from {{ ref('stg_orders') }}
