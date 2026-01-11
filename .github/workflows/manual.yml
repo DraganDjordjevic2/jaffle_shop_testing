@@ -1,0 +1,43 @@
+name: Deploy dbt Docs to EC2
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy-docs:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Run in dev container
+        uses: devcontainers/ci@v0.3
+        with:
+          runCmd: dbt docs generate --static
+      
+      - name: Upload to EC2
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+          EC2_KEY: ${{ secrets.EC2_SSH_KEY }}
+        run: |
+          echo "$EC2_KEY" > ec2_key.pem
+          chmod 600 ec2_key.pem
+          
+          # Upload to home directory first
+          scp -i ec2_key.pem \
+              -o StrictHostKeyChecking=no \
+              target/static_index.html \
+              ${EC2_USER}@${EC2_HOST}:~/static_index.html
+          
+          # Then move to final location with sudo
+          ssh -i ec2_key.pem \
+              -o StrictHostKeyChecking=no \
+              ${EC2_USER}@${EC2_HOST} \
+              "sudo mv ~/static_index.html /var/www/html/"
+          
+          rm ec2_key.pem
